@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+<script src="../../bower_components/html2canvas-master/html2canvas-master/dist/html2canvas.svg.min.js"></script>
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script> <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>             
+<script src="facebook.js"></script>
+<script src="jquery-3.2.1.min.js"></script>
+<script src="FileSaver.js"></script>
+<script src="jquery.wordexport.js"></script>
+<body>
+<button onclick="goBack()">Go Back</button>
+
+
+
+<a class="word-export" href="javascript:void(0)"> Export as .doc </a> 
+
+
+
+
+<div id="export"> 
+<h3 id="followers"></h3>
+<div id="box1">
+  
+  
+
+
+</div>
+<div id="muh" class="fb-post" data-href="https://www.facebook.com/20531316728/posts/10154009990506729/" data-width="500"></div>
+</div>
+<div id='div1'></div>
+<div id='div2'></div>
+<div id='div3'></div>
+<div id='div4'></div>
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+	
+#box1 {
+  width:300px;
+  height:400px;
+  background:white;
+  border-style: solid;
+  border-radius:3px;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+
+
+
+
+
+
+
+
+
+</style>
+<script>
+
+				function goBack() {
+			    window.history.back()
+			}  
+		
+        $("a.word-export").click(function(event) {
+             alert("bug");
+            $("#export").wordExport();
+        });
+       
+       
+		
+   
+    var div = document.getElementById('followers');
+    div.innerHTML += JSON.parse(sessionStorage.getItem("follows"))+" followers";
+
+
+    var elem = document.createElement("img");
+    elem.setAttribute("src", "https://scontent.xx.fbcdn.net/v/t1.0-9/q89/p720x720/969299_10152364594836729_2104407554_n.jpg?oh=ba732228da8504ddab18af26fbe38715&oe=5A29814C");
+
+    elem.setAttribute("height", "300");
+    elem.setAttribute("width", "300");
+    document.getElementById("box1").appendChild(elem);
+
+    var elem2 = document.createElement("img");
+    elem2.setAttribute("src", "pngs/heart.png");
+    elem2.innerHTML+="5 likes";
+    document.getElementById("box1").appendChild(elem2);
+
+    var elem3 = document.createElement("img");
+    elem3.setAttribute("src", "pngs/comment.png");
+    document.getElementById("box1").appendChild(elem3);
+
+    var elem4 = document.createElement("img");
+    elem4.setAttribute("src", "pngs/camera.png");
+    elem4.setAttribute("style", "float: right");
+    document.getElementById("box1").appendChild(elem4);
+    
+      google.charts.load('current', {'packages':['table']});
+      google.charts.setOnLoadCallback(drawTable);
+
+      function drawTable() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Name');
+        data.addColumn('number', 'Salary');
+        data.addColumn('boolean', 'Full Time Employee');
+        data.addRows([
+          ['Mike',  {v: 10000, f: '$10,000'}, true],
+          ['Jim',   {v:8000,   f: '$8,000'},  false],
+          ['Alice', {v: 12500, f: '$12,500'}, true],
+          ['Bob',   {v: 7000,  f: '$7,000'},  true]
+        ]);
+
+        var table_div = document.getElementById('div4');
+        var table = new google.visualization.Table(table_div);
+         google.visualization.events.addListener(table, 'ready', function () {
+        
+        
+        
+        
+      });
+        table.draw(data, {showRowNumber: true, width: '100%', height: '100%'});
+      }
+    
+    google.charts.load("current", {packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    google.charts.load("current", {packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart2);
+    google.charts.load("current", {packages:['corechart']});
+    google.charts.setOnLoadCallback(drawChart3);
+    
+    function drawChart() {
+      
+      
+      var dataArray = [['Year','Count']];
+        
+        dataArray.push (['2016', parseInt(sessionStorage["2016-likes"])]) ;
+        dataArray.push (['2017', parseInt(sessionStorage["2017-likes"])]) ;
+
+      var data = google.visualization.arrayToDataTable(dataArray);
+
+      var options = {
+        title: "Likes",
+        width:'300',
+        height: "200",
+        bar: {groupWidth: '95%'},
+        legend: 'none',
+      };
+      
+      var chart_div = document.getElementById("div1");
+      var chart = new google.visualization.BarChart(chart_div);
+
+      // Wait for the chart to finish drawing before calling the getImageURI() method.
+      google.visualization.events.addListener(chart, 'ready', function () {
+       
+      chart_div.innerHTML= '<img src="' + chart.getImageURI() + '">';
+       
+      });
+
+      chart.draw(data, options);
+
+  }
+
+function drawChart2() {
+      
+      
+      var dataArray = [['Year','Count']];
+ 
+       
+        dataArray.push (['2016', parseInt(sessionStorage["2016-reach"])]) ;
+        dataArray.push (['2017', parseInt(sessionStorage["2017-reach"])]) ;
+
+      var data = google.visualization.arrayToDataTable(dataArray);
+
+      var options = {
+        title: "Reach",
+        width:'300',
+        height: "200",
+        bar: {groupWidth: '95%'},
+        legend: 'none',
+      };
+      
+      var chart_div = document.getElementById("div2");
+      var chart = new google.visualization.BarChart(chart_div);
+
+      // Wait for the chart to finish drawing before calling the getImageURI() method.
+      google.visualization.events.addListener(chart, 'ready', function () {
+        
+      chart_div.innerHTML= '<img src="' + chart.getImageURI() + '">';
+       
+      });
+
+      chart.draw(data, options);
+
+  }
+  function drawChart3() {
+      
+      
+      var dataArray = [['Year','Count']];
+ 
+       alert(sessionStorage["2016-eng"]);
+       alert(sessionStorage["2017-eng"]);
+       dataArray.push (['2016', parseInt(sessionStorage["2016-eng"])]) ;
+       dataArray.push (['2017', parseInt(sessionStorage["2017-eng"])]) ;
+
+      var data = google.visualization.arrayToDataTable(dataArray);
+
+      var options = {
+        title: "Engagement",
+        width:'300',
+        height: "200",
+        bar: {groupWidth: '95%'},
+        legend: 'none',
+      };
+      
+      var chart_div = document.getElementById("div3");
+      var chart = new google.visualization.BarChart(chart_div);
+
+      // Wait for the chart to finish drawing before calling the getImageURI() method.
+      google.visualization.events.addListener(chart, 'ready', function () {
+        
+      chart_div.innerHTML= '<img src="' + chart.getImageURI() + '">';
+       
+      });
+
+      chart.draw(data, options);
+
+  }
+
+
+  
+      html2canvas($('#box1'), {
+
+        onrendered: function (canvas) {
+            
+           
+            var dataImg = canvas.toDataURL("image/png")
+            var ID=sessionStorage.getItem("userID");
+            $.post("phpWord.php", { data: dataImg, id:ID });
+            var div = document.getElementById('export');
+            div.innerHTML = '<img src="images/' + ID + '.png">';;
+        },
+        width:400,
+        height:450,
+        useCORS: true
+    });
+      
+    
+   
+
+
+
+		
+</script>
+</html>

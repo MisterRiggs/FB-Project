@@ -1,0 +1,63 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<script src="facebook.js"></script>
+<dom-module id="login-page">
+    <template>
+        <style>
+            :host {
+                display: block;
+                margin-top: 72px;
+            }
+            input {
+                display: block;
+                margin: auto;
+                width: 12%;
+                
+            }
+            
+            #wrapper {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+        </style>
+            
+            
+        
+
+            <div id="wrapper">
+            
+                
+                    <img src="/images/logo.png" width="250px" height="250px" />
+                
+            
+                       
+            </div>
+                
+                    <input type="submit" class="waves-effect waves-light btn" value="Log In" on-tap="handleLogin">
+                    
+           
+            
+            
+        
+    </template>
+
+    <script>
+        LoginApp=Polymer({
+
+            is: 'login-page',
+
+            handleLogin : function() {
+                FB.login(function(response) {
+                    if (response.authResponse) {
+                       
+                        window.location.reload();
+                    }
+                }, {scope: 'public_profile,email,manage_pages,read_insights'});
+
+                
+            }
+
+        });
+    </script>
+</dom-module>

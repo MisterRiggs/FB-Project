@@ -1,0 +1,1125 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+
+
+
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/promise-polyfill/promise-polyfill.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+<script src="facebook.js"></script>
+
+<dom-module id="my-view1">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        background: #f7f7f7;
+        padding: 10px;
+      }
+
+      
+      #pagelist{
+                width: 50%;
+                height:50%;
+                
+      }
+      #instagram{
+                width: 50%;
+                height:50%;
+                
+      }
+      #Report{
+                width: 80%;
+                height:80%;
+                
+      }
+      #wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      td {
+                padding-top: 20px;
+                padding-bottom: 20px;
+      }
+      tr {
+                cursor: pointer;
+      } 
+      tr:hover td {
+                background-color:#D3D3D3;
+            }  
+      tr:highlight td {
+                background-color:#D3D3D3;
+            }        
+    </style>
+
+       
+      
+      <div style="text-align:center; margin-top:5em;">
+      <a class="btn-instagram" href="https://api.instagram.com/oauth/authorize/?scope=follower_list&client_id=c929a927ea084a6f999f1caeb7f37c1c&redirect_uri=http://localhost:8081&response_type=token">
+      <b>Sign in</b> with Instagram
+      </a>
+      </div>
+    
+      <a on-click="instagram">Link</a>
+
+     
+
+      
+      <div id="wrapper">
+      <button type="button" on-click="callback">Create Report</button>
+      </div>
+      
+          <paper-dialog id="pagelist" >
+           <div id="wrapper">
+          <h1>Facebook Pages</h1>
+          </div>
+          <table class="highlight centered-scroll">
+      <template is="dom-repeat" items="{{Pages}}">
+
+                                <tr on-tap="reportType" id={{item.id}} >
+                                    <td>{{item.name}}</td>
+                                    
+                               </tr>
+
+
+      </template>
+          </table>
+          <div class="modal-footer">
+                    <a class="modal-action modal-close light blue white text waves-effect waves-green btn-flat" on-tap="reportType" style=" float:right;" dialog-confirm>skip</a>
+          </div>
+          
+     </paper-dialog>
+     <paper-dialog id="instagram" >
+     <h1>Report Type</h1>
+                    
+                     <paper-radio-group id="FBType">
+                      <paper-radio-button name="MtM" label="Small">Month To Month 
+                      <input type="text" id="fmonth" name="fmonth" placeholder="yyyy-mm"> to
+                      <input type="text" id="lmonth" name="lmonth" placeholder="yyyy-mm">
+                      </paper-radio-button><br>
+                      <paper-radio-button name="YoY" label="Medium">Year Over Year 
+                      <input type="text" id="YoYmonth" name="YoYmonth" placeholder="mm">
+                      </paper-radio-button><br>
+                      <paper-radio-button name="Month" label="Large">Just This Month</paper-radio-button>
+                      
+                     </paper-radio-group>
+
+                    <paper-radio-group id="InstagramType">
+                      <paper-radio-button name="Include" label="Small">Include Insagram Data</paper-radio-button><br>
+                      <paper-radio-button name="Only" label="Medium">Only Instagram Report</paper-radio-button>
+                      
+                    </paper-radio-group>
+                     
+            
+      
+      <div id="wrapper">
+          <button type="button" on-click="getInsights" >Generate Report</button>
+           <button type="button" on-click="topPerformingPosts" >Posts</button>
+          </div>
+     </paper-dialog>
+     
+      <paper-dialog id="Report" >
+      <div id="wrapper">
+      <table class="highlight centered">
+                            <thead>
+                            <tr>
+                                <th>Likes</th>
+                                <th>Engagements</th>
+                                <th>Reach</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            
+                                <tr >
+                                    <td>{{likes}}</td>
+                                    <td>
+                                      {{engagements}}  
+                                    </td>
+                                    <td>
+                                       {{reach}} 
+                                    </td>
+                                </tr>
+                            
+                            </tbody>
+                        </table>
+                        </div>
+                        <img src=""/>
+                        
+                       
+      </paper-dialog>
+      
+    
+
+      </template>
+      
+      
+  <script>
+    
+   var array=[];
+            FB.api('/me?fields=id', function(response){
+            if(response && !response.error){
+              alert(response.id);
+              myStorage = window.sessionStorage;
+              sessionStorage.setItem("userID", response.id);
+              
+              this.Pages=array;
+              
+              } 
+
+            });
+
+            FB.api('/me/accounts', function(response){
+            if(response && !response.error){
+              for(i in response.data)
+                { var pages={name:response.data[i].name, id:response.data[i].id}
+                  array.push(pages);
+                  
+                  
+                  
+                  
+                }
+              myStorage = window.sessionStorage;
+              sessionStorage.setItem("Pages", JSON.stringify(array));
+              
+              this.Pages=array;
+              
+              } 
+
+            });
+    if(window.location.hash)
+    {   
+    var access_token=window.location.hash.substring(1);
+    }
+    else {window.location.href="https://api.instagram.com/oauth/authorize/?scope=follower_list&client_id=c929a927ea084a6f999f1caeb7f37c1c&redirect_uri=http://localhost&response_type=token";
+    }
+  
+    Polymer({
+
+            is: 'my-view1',
+            properties: {
+              instatus:{
+                type :String
+                
+              },
+             
+              selectedPage: {
+                type : String
+              },
+               likes : {
+                type : String
+                
+              },
+               engagements : {
+                type : String
+              },
+               Reach : {
+                type : String
+              },
+              Pages :{
+                 type : Array
+              },
+              Page : {
+                type : String
+              },
+              followers : {
+                type : String
+                
+              },
+               messages :{
+                 type : Array
+              
+              }
+              
+            },
+            
+         
+          
+          callback : function () {
+            var Pages = JSON.parse(sessionStorage.getItem("Pages"));
+            this.Pages=Pages;
+            
+            this.$.pagelist.open();
+          },
+          
+          
+          instagram(){
+
+              var array=[];
+              var top=0;
+              var top2=0;
+              var topid;
+              $.getJSON('https://api.instagram.com/v1/users/self/media/recent/?max_id=1591723170637626971_5856093111&'+access_token+'&callback=?',
+              function(data) {
+                console.log(data);
+              for (i in data.data){
+                    
+                    var posts={id: data.data[i].id , performance:data.data[i].likes.count+data.data[i].comments.count}
+                    array.push(posts);
+                    
+                  }
+                          for (j in array)
+                          { 
+                            if(array[j].performance>=top)
+                            {
+                              top=array[j].performance;
+                              topid=array[j].id;
+                            }
+                            
+
+                          }
+                                     for (k in array)
+                                    { 
+
+                                      if(array[k].performance>=top2)
+                                        { 
+                                          if(array[k].id!=topid)
+                                          {
+                                            top2=array[k].performance;
+                                          }
+                                      }
+                                     
+
+                                    }
+                  console.log(top);
+                  console.log(top2);
+                }
+              
+              );
+              
+            },
+         
+          getInsights : function (){
+
+                if(this.$.FBType.selected=="MtM"){
+                  this.MtM();
+                }
+
+                if(this.$.FBType.selected=="YoY"){
+                  this.YoY();
+                }
+                
+                if(this.$.FBType.selected=="Month"){
+                  this.JustMonth();
+                }
+          
+              
+            
+            },
+          
+          YoY(){
+
+            var selectedPage=this.selectedPage;
+            var k=0; 
+            var PostArray=[];
+            var month=this.$.YoYmonth.value;
+            var Nmonth=parseInt(month)+1;
+            
+            var year;
+            var first;
+            var last;
+            var mIndex=0;
+            getMetrics();
+            function getMetrics(){   
+                    k=0;
+                    
+                    mIndex++;
+
+                    if(mIndex==1)
+                    {
+                    year=new Date().getFullYear(); 
+                    
+                    first=year+'-'+month+'-01';
+                    last=year+'-0'+Nmonth+'-01';
+                    }
+                    else{
+                    year=new Date().getFullYear()-1;
+                    
+                    first=year+'-'+month+'-01';
+                    last=year+'-0'+Nmonth+'-01';
+                    
+                    }
+                    if(mIndex<3)
+                    {    alert(mIndex);
+                        goMetrics();
+                    }
+                    else{
+                      
+                      window.location.href="src/my-report.html";
+                    }
+
+
+                } 
+            function goMetrics(){ 
+            FB.api(selectedPage+'/insights/?metric=page_fan_adds_unique&period=day&until='+last+'&since='+first, function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  { var likes=0;
+                     for(j in response.data[i].values)
+                      { 
+                        likes=likes+response.data[i].values[j].value
+                      }
+                       
+                       myStorage = window.sessionStorage;
+                       
+                       sessionStorage[year+"-likes"]=likes;
+                       
+                       
+
+                  }
+                 
+                comCall();  
+               
+                 
+                
+              } 
+              
+            });
+           
+           
+              
+            FB.api(selectedPage+'/insights/?metric=page_impressions_unique&period=day&until='+last+'&since='+first, function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  { var reach=0;
+                     for(j in response.data[i].values)
+                      { 
+                        reach=reach+response.data[i].values[j].value
+                        
+                      }
+                      
+                      myStorage = window.sessionStorage;
+                      sessionStorage[year+"-reach"]=reach;
+
+                      
+                  }
+                  comCall();  
+                 
+              } 
+
+            });
+
+            
+            FB.api(selectedPage+'/insights/?metric=page_post_engagements&period=day&until='+last+'&since='+first, function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  { var engagement=0;
+                     for(j in response.data[i].values)
+                      { 
+                        engagement=engagement+response.data[i].values[j].value
+                      }
+                      
+                      myStorage = window.sessionStorage;
+                      sessionStorage[year+"-eng"]=engagement;
+                        
+                  }
+                } 
+              comCall();      
+              
+                  
+            });
+
+            }
+          
+            
+               
+                $.getJSON(
+                'https://api.instagram.com/v1/users/self/?'+access_token+'&callback=?',
+                function(data) {
+                  myStorage = window.sessionStorage;
+                  sessionStorage.setItem("follows", JSON.stringify(data.data.counts.follows));
+                  
+                  comCall();  
+                }
+            );
+
+               
+            
+
+            var array=[];
+            FB.api(this.selectedPage+'/posts', function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  {  
+                    if(response.data[i].message){
+                       var data={id: response.data[i].id, message:response.data[i].message}
+                      array.push(data);
+                      
+                      }
+                     
+                  }
+                callback1();
+              
+               } 
+
+             }); 
+                 var index=-1;
+                function callback1(){    
+                    
+                    index++;
+                    
+                    if(index<array.length)
+                    {
+                    getPosts(array[index].id);
+                    }
+
+
+                }   
+                   function getPosts(id){
+                    
+                    var getPostIndex=0;
+                    var data={id:id, shares:0,likes:0,comments:0}
+
+                    FB.api(id+'/?fields=shares', function(response){
+                         if(response && !response.error){
+                            if(response.shares){
+
+                            data.shares=response.shares.count;
+                            
+                            
+                              }
+                           } 
+                            callback();
+                          });
+
+                     FB.api(id+'/likes?summary=true', function(response){
+                         if(response && !response.error){
+                            data.likes=response.summary.total_count;
+                            
+                            
+                           } 
+                           callback();
+                          });
+
+                     FB.api(id+'/comments?summary=true', function(response){
+                         if(response && !response.error){
+                              data.comments=response.summary.total_count;
+                              
+                              
+                           } 
+                            callback();
+                          });
+                      function callback(){
+                        getPostIndex++;
+                          if(getPostIndex==3)
+                            {   
+                                PostArray.push(data);
+                                
+                                callback1();
+                            }
+
+                      }
+                     
+                   }
+
+            function comCall()
+               {
+                  k++;
+                    
+                    if(k==3)  //when all api.request are done
+                    {
+                       getMetrics();
+                    }
+               } 
+
+                },
+          
+          MtM(){
+
+            var selectedPage=this.selectedPage;
+            var k=0;
+            var PostArray=[];
+            var PageArray=[];
+            var DatesArray=this.getMtMDates();
+            
+            var mIndex=-1;
+            for(i in DatesArray)
+            {
+              alert(DatesArray[i]);
+            }
+            getMetrics();
+            function getMetrics(){    
+                    k=0;
+                    mIndex++;
+                    
+                    if(mIndex<DatesArray.length-1)
+                    {
+                        goMetrics(DatesArray[mIndex],DatesArray[mIndex+1]);
+                    }
+                    else{
+                      
+                    }
+
+
+                } 
+            function goMetrics(first,last){ 
+
+              var pageData={month:first.substring(0,3),likes:0,reach:0,engagement:0}
+            FB.api(selectedPage+'/insights/?metric=page_fan_adds_unique&period=day&until='+last+'&since='+first, function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  { var likes=0;
+                     for(j in response.data[i].values)
+                      { 
+                        likes=likes+response.data[i].values[j].value
+                      }
+                      pageData.likes=likes;
+                       
+
+                  }
+                 
+                comCall();  
+               
+                 
+                
+              } 
+              
+            });
+           
+           
+              
+            FB.api(selectedPage+'/insights/?metric=page_impressions_unique&period=day&until='+last+'&since='+first, function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  { var reach=0;
+                     for(j in response.data[i].values)
+                      { 
+                        reach=reach+response.data[i].values[j].value
+                        
+                      }
+                      pageData.reach=reach;
+
+                      
+                  }
+                  comCall();  
+                 
+              } 
+
+            });
+
+            
+            FB.api(selectedPage+'/insights/?metric=page_post_engagements&period=day&until='+last+'&since='+first, function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  { var engagement=0;
+                     for(j in response.data[i].values)
+                      { 
+                        engagement=engagement+response.data[i].values[j].value
+                      }
+                      pageData.engagement=engagement;
+                        
+                  }
+                } 
+              comCall();      
+              
+                  
+            });
+
+            function comCall()
+             {
+                k++;
+                  
+                  if(k==3)  //when all api.request are done
+                  {  PageArray.push(pageData);
+                    alert(PageArray);
+                     getMetrics();
+                  }
+             } 
+
+            }
+          
+            
+               
+                $.getJSON(
+                'https://api.instagram.com/v1/users/self/?'+access_token+'&callback=?',
+                function(data) {
+                  myStorage = window.sessionStorage;
+                  sessionStorage.setItem("follows", JSON.stringify(data.data.counts.follows));
+                  
+                   
+                }
+            );
+
+               
+            
+
+            var array=[];
+            FB.api(this.selectedPage+'/posts', function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  {  
+                    if(response.data[i].message){
+                       var data={id: response.data[i].id, message:response.data[i].message}
+                      array.push(data);
+                      
+                      }
+                     
+                  }
+                callback1();
+              
+               } 
+
+             }); 
+                 var index=-1;
+                function callback1(){    
+                    
+                    index++;
+                    
+                    if(index<array.length)
+                    {
+                    getPosts(array[index].id);
+                    }
+
+
+                }   
+                   function getPosts(id){
+                    
+                    var getPostIndex=0;
+                    var data={id:id, shares:0,likes:0,comments:0}
+
+                    FB.api(id+'/?fields=shares', function(response){
+                         if(response && !response.error){
+                            if(response.shares){
+
+                            data.shares=response.shares.count;
+                            
+                            
+                              }
+                           } 
+                            callback();
+                          });
+
+                     FB.api(id+'/likes?summary=true', function(response){
+                         if(response && !response.error){
+                            data.likes=response.summary.total_count;
+                            
+                            
+                           } 
+                           callback();
+                          });
+
+                     FB.api(id+'/comments?summary=true', function(response){
+                         if(response && !response.error){
+                              data.comments=response.summary.total_count;
+                              
+                              
+                           } 
+                            callback();
+                          });
+                      function callback(){
+                        getPostIndex++;
+                          if(getPostIndex==3)
+                            {   
+                                PostArray.push(data);
+                                
+                                callback1();
+                            }
+
+                      }
+                     
+                   }
+
+          
+
+          
+   
+
+            
+          },
+          JustMonth(){
+            
+            var selectedPage=this.selectedPage;
+            var k=0;
+            var month=this.getDate();
+            var first=this.getFOM();
+            PostArray=[];
+            
+
+            FB.api(selectedPage+'/insights/?metric=page_fan_adds_unique&period=day&since='+first, function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  { var likes=0;
+                     for(j in response.data[i].values)
+                      { 
+                        likes=likes+response.data[i].values[j].value
+                      }
+                       
+                       myStorage = window.sessionStorage;
+                       sessionStorage.setItem("likes", JSON.stringify(likes));
+                       
+
+                  }
+                 
+                comCall();  
+               
+                 
+                
+              } 
+              
+            });
+           
+           
+              
+            FB.api(selectedPage+'/insights/?metric=page_impressions&period=day&since='+first, function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  { var reach=0;
+                     for(j in response.data[i].values)
+                      { 
+                        reach=reach+response.data[i].values[j].value
+                        
+                      }
+                      myStorage = window.sessionStorage;
+                      sessionStorage.setItem("reach", JSON.stringify(reach));
+
+                      
+                  }
+                  comCall();  
+                 
+              } 
+
+            });
+
+            
+            FB.api(selectedPage+'/insights/?metric=page_post_engagements&period=day&since='+first, function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  { var engagement=0;
+                     for(j in response.data[i].values)
+                      { 
+                        engagement=engagement+response.data[i].values[j].value
+                      }
+                      myStorage = window.sessionStorage;
+                      sessionStorage.setItem("engagement", JSON.stringify(engagement));
+                        
+                  }
+                } 
+              comCall();      
+              
+                  
+            });
+
+            
+          
+            
+               
+                $.getJSON(
+                'https://api.instagram.com/v1/users/self/?'+access_token+'&callback=?',
+                function(data) {
+                  myStorage = window.sessionStorage;
+                  sessionStorage.setItem("follows", JSON.stringify(data.data.counts.follows));
+                  
+                  comCall();  
+                }
+            );
+
+               
+            
+
+            var array=[];
+            FB.api(this.selectedPage+'/posts', function(response){
+            if(response && !response.error){
+              
+                
+                 for(i in response.data)
+                  {  
+                    if(response.data[i].message){
+                       var data={id: response.data[i].id, message:response.data[i].message}
+                      array.push(data);
+                      
+                      }
+                     
+                  }
+                callback1();
+              
+               } 
+
+             }); 
+                 var index=-1;
+                function callback1(){    
+                    
+                    index++;
+                    
+                    if(index<array.length)
+                    {
+                    getPosts(array[index].id);
+                    }
+                    else{
+                      getTopPosts();
+                    }
+
+
+                }  
+
+                function getTopPosts(){
+                  var reach=0;
+                  for(i in PostArray)
+                  {
+                      if(PostArray[i].reach>=reach)
+                      {
+                        reach=PostArray[i].reach;
+                      }
+                     
+                  } 
+                  console.log(reach)
+                  var clicks=0;
+                  for(j in PostArray)
+                  {
+                     if(PostArray[j].clicks>=clicks)
+                      {
+                        clicks=PostArray[j].clicks;
+                      }
+                  }
+                  console.log(clicks);
+                  var activity=0;
+                  for(k in PostArray)
+                  {
+                     if(PostArray[k].shares+PostArray[k].likes+PostArray[k].comments>=activity)
+                      {
+                        activity=PostArray[k].shares+PostArray[k].likes+PostArray[k].comments;
+                      }
+                  }
+                  console.log(activity);
+                } 
+
+                   function getPosts(id){
+                    var getPostIndex=0;
+                    var data={id:id, shares:0,likes:0,comments:0,clicks:0,reach:0}
+
+                    FB.api(id+'/?fields=shares', function(response){
+                         if(response && !response.error){
+                            if(response.shares){
+
+                            data.shares=response.shares.count;
+                            alert(response.shares.count+"shares");
+                            
+                              }
+                           } 
+                            callback();
+                          });
+
+                     FB.api(id+'/likes?summary=true', function(response){
+                         if(response && !response.error){
+                            data.likes=response.summary.total_count;
+                            alert(response.summary.total_count+"likes");
+                            
+                           } 
+                           callback();
+                          });
+
+                     FB.api(id+'/comments?summary=true', function(response){
+                         if(response && !response.error){
+                              data.comments=response.summary.total_count;
+                              alert(response.summary.total_count+"commens");
+                              
+                           } 
+                            callback();
+                          });
+                     FB.api(id+'/insights/post_consumptions', function(response){
+                         if(response && !response.error){
+                              data.clicks=response.data[0].values[0].value;
+                              alert(data.clicks);
+                              
+                           } 
+                            callback();
+                          });
+                     FB.api(id+'/insights/post_impressions_unique', function(response){
+                         if(response && !response.error){
+                              data.reach=response.data[0].values[0].value;
+                              alert(data.reach);
+                              
+                           } 
+                            callback();
+                          });
+
+                      function callback(){
+                        getPostIndex++;
+                          if(getPostIndex==5)
+                            {   
+                                PostArray.push(data);
+                                alert(PostArray);
+                                callback1();
+                            }
+
+                      }
+                     
+                   }
+
+
+
+             function comCall()
+             {
+                k++;
+                  
+                  if(k==4)  //when all api.request are done
+                  {
+                     
+                  }
+             }        
+
+            },
+          
+          getReport(){//not using currently
+           
+
+          
+            this.$.instagram.close();
+            this.$.Report.open();
+            
+          },
+          reportType(e){
+            var id=e.currentTarget.id;
+            alert(id);
+            this.selectedPage=id;
+            this.$.pagelist.close();
+            this.$.instagram.open();
+
+          },
+          getDate(){
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth()+1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            if(dd<10) {
+                dd = '0'+dd
+            } 
+
+            if(mm<10) {
+                mm = '0'+mm
+            } 
+
+            today = yyyy + '-' + mm + '-' + dd;
+              return today;
+            
+          },
+          getFOM(){ //gets first of month
+            var today = new Date();
+            var mm = today.getMonth()+1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            
+
+            if(mm<10) {
+                mm = '0'+mm
+            } 
+
+            today = yyyy + '-' + mm + '-' + '01';
+              return today;
+            
+          },
+          getMtMDates(){
+            
+            var fmonth=this.$.fmonth.value.substring(5);
+            var lmonth=this.$.lmonth.value.substring(5);
+            var fyear=this.$.fmonth.value.substring(0,4);
+            var lyear=this.$.lmonth.value.substring(0,4);
+            var array=[];
+            var date;
+            fmonth=parseInt(fmonth);
+            lmonth=parseInt(lmonth);
+            if(lmonth==12)
+            {
+              lyear=parseInt(lyear+1);
+              lmonth=1;
+            }
+            else{lmonth=parseInt(lmonth+1)};
+            if(parseInt(fyear)<parseInt(lyear))
+            {
+              for(index=fyear;index<=lyear;index++)
+              { 
+                if(index==fyear){
+                    for(mIndex=fmonth;mIndex<=12;mIndex++)
+                    { 
+                      if(mIndex<10) {
+                            date=index+'-0'+mIndex+'-01';
+                        }
+                      else{ date=index+'-'+mIndex+'-01';}
+                      array.push(date);
+                    }
+                }
+                if(index<lyear&&index!=fyear){
+                    for(mIndex=1;mIndex<=12;mIndex++)
+                    { 
+                      if(mIndex<10) {
+                            date=index+'-0'+mIndex+'-01';
+                        }
+                      else{ date=index+'-'+mIndex+'-01';}
+                      array.push(date);
+                    }
+                }
+
+
+                if(index==lyear){
+                    for(mIndex=1;mIndex<=lmonth;mIndex++)
+                    {
+                    if(mIndex<10) {
+                            date=index+'-0'+mIndex+'-01';
+                        }
+                      else{ date=index+'-'+mIndex+'-01';}
+                    array.push(date);
+                    }
+
+                }
+
+              }
+            }else{
+                  for(mIndex=fmonth;mIndex<=lmonth;mIndex++)
+                        {
+                        if(mIndex<10) {
+                                date=fyear+'-0'+mIndex+'-01';
+                            }
+                          else{ date=fyear+'-'+mIndex+'-01';}
+                        array.push(date);
+                        }
+
+                  }
+
+                return array;
+            
+            
+          }
+
+          });
+          
+     
+</script>
+ 
+
+</dom-module>
+    
